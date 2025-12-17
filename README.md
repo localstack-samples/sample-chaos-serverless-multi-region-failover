@@ -62,7 +62,7 @@ To run the sample application, you need to install the required dependencies.
 First, clone the repository:
 
 ```shell
-git clone https://github.com/localstack/sample-chaos-serverless-multi-region-failover.git
+git clone https://github.com/localstack-samples/sample-chaos-serverless-multi-region-failover.git
 ```
 
 Then, navigate to the project directory:
