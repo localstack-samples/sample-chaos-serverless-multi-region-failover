@@ -38,6 +38,7 @@ deploy:			## Deploy all solutions
 	@echo "All solutions deployed successfully."
 
 start:			## Start localstack
+	@test -n "${LOCALSTACK_AUTH_TOKEN}" || (echo "LOCALSTACK_AUTH_TOKEN is not set. Find your token at https://app.localstack.cloud/workspace/auth-token"; exit 1)
 	LOCALSTACK_AUTH_TOKEN=$(LOCALSTACK_AUTH_TOKEN) docker compose up --build --detach --wait
 
 stop:			## Stop localstack
