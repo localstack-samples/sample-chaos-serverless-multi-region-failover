@@ -24,13 +24,13 @@ trap 'error_log "An error occurred. Exiting..."; exit 1' ERR
 
 # Setup SNS Topic
 log "Creating SNS topic 'ProductEventsTopic'..."
-SNS_TOPIC_ARN=$(awslocal sns create-topic --name ProductEventsTopic --output json | jq -r '.TopicArn')
+SNS_TOPIC_ARN=$(lstk aws sns create-topic --name ProductEventsTopic --output json | jq -r '.TopicArn')
 log "SNS topic created. ARN: $SNS_TOPIC_ARN"
 
 # Setup SQS Queue
 log "Creating SQS queue 'ProductEventsQueue'..."
-QUEUE_URL=$(awslocal sqs create-queue --queue-name ProductEventsQueue --output json | jq -r '.QueueUrl')
-QUEUE_ARN=$(awslocal sqs get-queue-attributes \
+QUEUE_URL=$(lstk aws sqs create-queue --queue-name ProductEventsQueue --output json | jq -r '.QueueUrl')
+QUEUE_ARN=$(lstk aws sqs get-queue-attributes \
     --queue-url $QUEUE_URL \
     --attribute-names QueueArn \
     --query 'Attributes.QueueArn' --output text)
@@ -38,7 +38,7 @@ log "SQS queue created. ARN: $QUEUE_ARN"
 
 # Subscribe SQS Queue to SNS Topic
 log "Subscribing SQS queue to SNS topic..."
-awslocal sns subscribe \
+lstk aws sns subscribe \
     --topic-arn $SNS_TOPIC_ARN \
     --protocol sqs \
     --notification-endpoint $QUEUE_ARN >/dev/null
@@ -46,7 +46,7 @@ log "SQS queue subscribed to SNS topic."
 
 # Create Lambda Function
 log "Creating Lambda function 'process-product-events'..."
-awslocal lambda create-function \
+lstk aws lambda create-function \
   --function-name process-product-events \
   --runtime java17 \
   --handler lambda.DynamoDBWriterLambda::handleRequest \
@@ -58,7 +58,7 @@ log "Lambda function created."
 
 # Create Event Source Mapping from SQS to Lambda
 log "Creating event source mapping from SQS to Lambda..."
-awslocal lambda create-event-source-mapping \
+lstk aws lambda create-event-source-mapping \
     --function-name process-product-events \
     --batch-size 10 \
     --event-source-arn $QUEUE_ARN >/dev/null
@@ -66,7 +66,7 @@ log "Event source mapping created."
 
 # Set Queue Attributes
 log "Setting SQS queue attributes..."
-awslocal sqs set-queue-attributes \
+lstk aws sqs set-queue-attributes \
     --queue-url $QUEUE_URL \
     --attributes VisibilityTimeout=10 >/dev/null
 log "SQS queue attributes set."

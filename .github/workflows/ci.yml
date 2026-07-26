@@ -35,7 +35,7 @@ jobs:
 
       - name: Setup the solutions
         run: |
-          pip install awscli-local
+          npm install -g @localstack/lstk
           make deploy
 
       - name: Run Integration Tests

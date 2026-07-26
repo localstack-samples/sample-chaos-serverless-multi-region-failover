@@ -4,7 +4,7 @@ services:
   localstack:
     networks:
       - ls_network
-    container_name: localstack
+    container_name: localstack-aws
     image: localstack/localstack-pro:latest
     ports:
       - "127.0.0.1:4566:4566"            # LocalStack Gateway

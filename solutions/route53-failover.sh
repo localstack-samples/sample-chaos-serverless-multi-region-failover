@@ -23,7 +23,7 @@ trap 'error_log "An error occurred. Exiting..."; exit 1' ERR
 # Step 1: Define Hosted Zone
 log "Defining hosted zone..."
 HOSTED_ZONE_NAME="hello-localstack.com"
-RAW_HOSTED_ZONE_ID=$(awslocal route53 create-hosted-zone \
+RAW_HOSTED_ZONE_ID=$(lstk aws route53 create-hosted-zone \
     --name "$HOSTED_ZONE_NAME" \
     --caller-reference "zone-$(date +%s)" | jq -r .HostedZone.Id)
 CLEANED_HOSTED_ZONE_ID="${RAW_HOSTED_ZONE_ID#/hostedzone/}"
@@ -49,7 +49,7 @@ log "Health Check Path: $HEALTH_CHECK_RESOURCE_PATH"
 # Step 3: Create Health Check for the Primary API Gateway
 log "Creating Route 53 health check..."
 HEALTH_CHECK_RESOURCE_REGION="us-west-1"
-HEALTH_CHECK_ID=$(awslocal route53 create-health-check \
+HEALTH_CHECK_ID=$(lstk aws route53 create-health-check \
     --caller-reference "hc-app-${PRIMARY_API_ID}-$(date +%s)" \
     --region "$HEALTH_CHECK_RESOURCE_REGION" \
     --health-check-config "{\"FullyQualifiedDomainName\": \"${PRIMARY_API_GATEWAY_FQDN}\", \"Port\": ${HEALTH_CHECK_PORT}, \"ResourcePath\": \"${HEALTH_CHECK_RESOURCE_PATH}\", \"Type\": \"HTTP\", \"RequestInterval\": 10, \"FailureThreshold\": 2}" | jq -r .HealthCheck.Id)
@@ -64,7 +64,7 @@ curl --connect-timeout 5 -v "http://${PRIMARY_API_GATEWAY_FQDN}:${HEALTH_CHECK_P
 
 log "Fetching health check status from Route 53 (may take a few seconds)..."
 sleep 25
-awslocal route53 get-health-check-status \
+lstk aws route53 get-health-check-status \
     --health-check-id "$HEALTH_CHECK_ID" \
     --region "$HEALTH_CHECK_RESOURCE_REGION" >/dev/null
 
@@ -102,7 +102,7 @@ CHANGE_BATCH_REGIONAL_CNAMES_JSON=$(cat <<EOF
 EOF
 )
 
-awslocal route53 change-resource-record-sets \
+lstk aws route53 change-resource-record-sets \
     --hosted-zone-id "$RAW_HOSTED_ZONE_ID" \
     --change-batch "$CHANGE_BATCH_REGIONAL_CNAMES_JSON" >/dev/null
 log "CNAME records created."
@@ -151,7 +151,7 @@ CHANGE_BATCH_FAILOVER_ALIASES_JSON=$(cat <<EOF
 EOF
 )
 
-awslocal route53 change-resource-record-sets \
+lstk aws route53 change-resource-record-sets \
     --hosted-zone-id "$RAW_HOSTED_ZONE_ID" \
     --change-batch "$CHANGE_BATCH_FAILOVER_ALIASES_JSON" >/dev/null
 log "Failover alias records created."

@@ -49,7 +49,7 @@ The following diagram shows the architecture that this sample application builds
 
 - A valid [LocalStack for AWS license](https://localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) to activate LocalStack.
 - [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/)
-- [AWS CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/) with the [`awslocal` wrapper](https://docs.localstack.cloud/user-guide/integrations/aws-cli/#localstack-aws-cli-awslocal)
+- [AWS CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/) with the [`lstk aws` proxy](https://docs.localstack.cloud/aws/tooling/lstk/)
 - [Maven 3.8.5+](https://maven.apache.org/install.html) & [Java 17](https://www.java.com/en/download/help/download_options.html)
 - [Python 3.11+](https://www.python.org/downloads/)
 - [`make`](https://www.gnu.org/software/make/) (**optional**, but recommended for running the sample application)
@@ -197,7 +197,7 @@ curl -X DELETE 'http://localhost:4566/_localstack/chaos/faults' \
 Query the DynamoDB table to see the product:
 
 ```shell
-awslocal dynamodb scan --table-name Products
+lstk aws dynamodb scan --table-name Products
 ```
 
 The key chaos engineering patterns used in this sample are:
@@ -257,10 +257,10 @@ curl -X DELETE 'http://localhost:4566/_localstack/chaos/faults' \
 
 | Issue | Resolution |
 |-------|------------|
-| DNS resolution returns NXDOMAIN | Ensure LocalStack is running with DNS enabled (port 53). Verify hosted zone exists with `awslocal route53 list-hosted-zones` |
-| Health checks always report unhealthy | Check that API Gateway endpoints respond with HTTP 200. Verify Lambda functions are deployed and working: `awslocal lambda list-functions` |
+| DNS resolution returns NXDOMAIN | Ensure LocalStack is running with DNS enabled (port 53). Verify hosted zone exists with `lstk aws route53 list-hosted-zones` |
+| Health checks always report unhealthy | Check that API Gateway endpoints respond with HTTP 200. Verify Lambda functions are deployed and working: `lstk aws lambda list-functions` |
 | Failover not triggering after chaos injection | Wait at least 25 seconds for health check failure threshold. Check chaos faults are active: `curl --location --request GET 'http://localhost.localstack.cloud:4566/_localstack/chaos/faults'` |
-| Products not appearing in DynamoDB after recovery | Verify SQS queue processing with `awslocal sqs receive-message`. Check Lambda function logs for processing errors |
+| Products not appearing in DynamoDB after recovery | Verify SQS queue processing with `lstk aws sqs receive-message`. Check Lambda function logs for processing errors |
 
 ## Learn More
 

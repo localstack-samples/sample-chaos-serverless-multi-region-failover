@@ -24,7 +24,7 @@ echo "Querying $FAILOVER_RECORD_NAME (should now point to secondary CNAME/target
 dig @127.0.0.1 "$FAILOVER_RECORD_NAME" CNAME +short
 echo
 echo "You can also try fetching the health check status again:"
-awslocal route53 get-health-check-status --health-check-id "$HEALTH_CHECK_ID" --region "$HEALTH_CHECK_RESOURCE_REGION"
+lstk aws route53 get-health-check-status --health-check-id "$HEALTH_CHECK_ID" --region "$HEALTH_CHECK_RESOURCE_REGION"
 echo
 echo
 
@@ -45,7 +45,7 @@ echo "Querying $FAILOVER_RECORD_NAME (should point back to primary CNAME/target)
 dig @127.0.0.1 "$FAILOVER_RECORD_NAME" CNAME +short
 echo
 echo "Final health check status:"
-awslocal route53 get-health-check-status --health-check-id "$HEALTH_CHECK_ID" --region "$HEALTH_CHECK_RESOURCE_REGION"
+lstk aws route53 get-health-check-status --health-check-id "$HEALTH_CHECK_ID" --region "$HEALTH_CHECK_RESOURCE_REGION"
 echo
 
 echo "Script finished."
