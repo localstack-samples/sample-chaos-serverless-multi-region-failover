@@ -36,6 +36,7 @@ jobs:
       - name: Setup the solutions
         run: |
           npm install -g @localstack/lstk
+          lstk setup aws
           make deploy
 
       - name: Run Integration Tests
